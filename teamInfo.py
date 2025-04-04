@@ -2,6 +2,7 @@ import discord
 import aiohttp
 
 from discord.ui import Button, View
+from discord import ButtonStyle, Embed, Interaction
 
 class BaseTeamView(View):
     def __init__(self, team_data, team_id):
@@ -12,6 +13,13 @@ class BaseTeamView(View):
         self.team_name = team_data["data"]["info"]["name"]
         self.players_data = team_data["data"].get("players", [])
         self.staff_data = team_data["data"].get("staff", [])
+
+        vlr_url = f"https://www.vlr.gg/team/{team_id}"
+        self.add_item(Button(
+            style=ButtonStyle.primary,
+            label="VLR Team Page",
+            url=vlr_url
+        ))
     
     def create_player_embed(self):
         if self.players_data:
@@ -22,7 +30,7 @@ class BaseTeamView(View):
         else:
             players = "No players listed"
         
-        embed = discord.Embed(title=f"{self.team_name}", color=discord.Color.blue())
+        embed = Embed(title=f"{self.team_name}", color=discord.Color.blue())
         embed.add_field(name="👥 Players", value=players, inline=False)
         embed.set_footer(text=f"Team ID: {self.team_id}")
 
@@ -39,7 +47,7 @@ class BaseTeamView(View):
         else:
             staff = "No staff listed"
             
-        embed = discord.Embed(title=f"{self.team_name}", color=discord.Color.green())
+        embed = Embed(title=f"{self.team_name}", color=discord.Color.green())
         embed.add_field(name="👥 Staff", value=staff, inline=False)
         embed.set_footer(text=f"Team ID: {self.team_id}")
 
@@ -48,20 +56,20 @@ class BaseTeamView(View):
         return embed
 
 class TeamInfoView(BaseTeamView):
-    @discord.ui.button(label="View Staff 👔", style=discord.ButtonStyle.primary, custom_id="view_staff")
-    async def view_staff_button(self, interaction: discord.Interaction, button: Button):
+    @discord.ui.button(label="View Staff 👔", style=ButtonStyle.primary, custom_id="view_staff")
+    async def view_staff_button(self, interaction: Interaction, button: Button):
         staff_view = StaffView(self.team_data, self.team_id)
         staff_embed = self.create_staff_embed()
         await interaction.response.edit_message(embed=staff_embed, view=staff_view)
 
 class StaffView(BaseTeamView):
-    @discord.ui.button(label="View Players 👥", style=discord.ButtonStyle.primary, custom_id="view_players")
-    async def view_players_button(self, interaction: discord.Interaction, button: Button):
+    @discord.ui.button(label="View Players 👥", style=ButtonStyle.primary, custom_id="view_players")
+    async def view_players_button(self, interaction: Interaction, button: Button):
         player_view = TeamInfoView(self.team_data, self.team_id)
         player_embed = self.create_player_embed()
         await interaction.response.edit_message(embed=player_embed, view=player_view)
 
-async def teamInfo(interaction: discord.Interaction, team_id: int):
+async def teamInfo(interaction: Interaction, team_id: int):
     url = f"http://localhost:5000/api/v1/teams/{team_id}"
     
     async with aiohttp.ClientSession() as session:

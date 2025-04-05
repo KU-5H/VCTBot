@@ -2,7 +2,9 @@ import discord
 import aiohttp
 
 from discord.ui import Button, View
-from discord import ButtonStyle, Embed, Interaction
+from discord import ButtonStyle, Embed, Interaction, app_commands
+
+from scripts.teamNameFetcher import getCachedMappingSync
 
 class BaseTeamView(View):
     def __init__(self, team_data, team_id):
@@ -69,7 +71,7 @@ class StaffView(BaseTeamView):
         player_embed = self.create_player_embed()
         await interaction.response.edit_message(embed=player_embed, view=player_view)
 
-async def teamInfo(interaction: Interaction, team_id: int):
+async def teamInfoById(interaction: Interaction, team_id: int):
     url = f"http://localhost:5000/api/v1/teams/{team_id}"
     
     async with aiohttp.ClientSession() as session:
@@ -86,3 +88,21 @@ async def teamInfo(interaction: Interaction, team_id: int):
                 await interaction.response.send_message(embed=embed, view=view)
             else:
                 await interaction.response.send_message(f"❌ Error: Unable to fetch data for team ID {team_id} (status code {response.status})")
+
+async def teamNameAutocomplete(interaction: Interaction, current: str) -> list[app_commands.Choice[str]]:
+
+    _, teamList = getCachedMappingSync()
+
+    if not current:
+        matches = teamList[:25]
+    else:
+        currentLower = current.lower()
+        matches = [
+            team for team in teamList if currentLower in team["name"].lower()
+        ][:25]
+    
+    return [
+        app_commands.Choice(name=team["name"], value=team["id"])
+        for team in matches
+    ]
+

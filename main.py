@@ -2,7 +2,7 @@ import discord
 import os
 from dotenv import load_dotenv
 
-from teamInfo import teamInfoById, teamInfoByName, teamNameAutocomplete
+from teamInfo import teamInfoById, teamNameAutocomplete
 from scripts.teamNameFetcher import initializeCache
 
 from discord.ext import commands

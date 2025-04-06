@@ -82,8 +82,8 @@ class BaseTeamView(View):
                 match_line = f"**{date_str}** · {time_str} · [{team1_name} vs {team2_name}]({match_url}) | {event_name}"
                 list_of_matches.append(match_line)
             
-            matchesText = "\n".join(list_of_matches)
-            embed.description = matchesText
+            matches_text = "\n".join(list_of_matches)
+            embed.description = matches_text
 
             if self.team_logo:
                 embed.set_thumbnail(url=self.team_logo)

@@ -102,7 +102,7 @@ class BaseTeamView(View):
         if self.results and len(self.results) > 0:
             list_of_matches = []
 
-            for i, match in enumerate(self.results[:15]):
+            for _, match in enumerate(self.results[:15]):
 
                 event_name = (match["event"]["name"] or "N/A")[:22].ljust(22)
 
@@ -134,7 +134,7 @@ class BaseTeamView(View):
         return embed
 
 class TeamInfoView(BaseTeamView):
-    @discord.ui.button(label="View Staff 👔", style=ButtonStyle.primary, custom_id="view_staff")
+    @discord.ui.button(label="View Staff 👔", style=ButtonStyle.primary, custom_id="view_staff_from_players")
     async def view_staff_button(self, interaction: Interaction, button: Button):
         staff_view = StaffView(self.team_data, self.team_id)
         staff_embed = self.create_staff_embed()
@@ -153,7 +153,7 @@ class TeamInfoView(BaseTeamView):
         await interaction.response.edit_message(embed=results_embed, view=results_view)
 
 class StaffView(BaseTeamView):
-    @discord.ui.button(label="View Players 👥", style=ButtonStyle.primary, custom_id="view_players")
+    @discord.ui.button(label="View Players 👥", style=ButtonStyle.primary, custom_id="view_players_from_staff")
     async def view_players_button(self, interaction: Interaction, button: Button):
         player_view = TeamInfoView(self.team_data, self.team_id)
         player_embed = self.create_player_embed()
@@ -165,27 +165,27 @@ class StaffView(BaseTeamView):
         matches_embed = self.create_upcoming_embed()
         await interaction.response.edit_message(embed=matches_embed, view=matches_view)
     
-    @discord.ui.button(label="View Results 📊", style=ButtonStyle.green, custom_id="view_results_from_matches")
+    @discord.ui.button(label="View Results 📊", style=ButtonStyle.green, custom_id="view_results_from_staff")
     async def view_results_button(self, interaction: Interaction, button: Button):
         results_view = ResultsView(self.team_data, self.team_id)
         results_embed = self.create_results_embed()
         await interaction.response.edit_message(embed=results_embed, view=results_view)
 
 class UpcomingMatchesView(BaseTeamView):
-    @discord.ui.button(label="View Players 👥", style=ButtonStyle.primary, custom_id="view_players_from_matches")
+    @discord.ui.button(label="View Players 👥", style=ButtonStyle.primary, custom_id="view_players_from_upcoming")
     async def view_players_button(self, interaction: Interaction, button: Button):
         player_view = TeamInfoView(self.team_data, self.team_id)
         player_embed = self.create_player_embed()
         await interaction.response.edit_message(embed=player_embed, view=player_view)
     
     # Add button to view staff
-    @discord.ui.button(label="View Staff 👔", style=ButtonStyle.primary, custom_id="view_staff_from_matches")
+    @discord.ui.button(label="View Staff 👔", style=ButtonStyle.primary, custom_id="view_staff_from_upcoming")
     async def view_staff_button(self, interaction: Interaction, button: Button):
         staff_view = StaffView(self.team_data, self.team_id)
         staff_embed = self.create_staff_embed()
         await interaction.response.edit_message(embed=staff_embed, view=staff_view)
     
-    @discord.ui.button(label="View Results 📊", style=ButtonStyle.green, custom_id="view_results_from_matches")
+    @discord.ui.button(label="View Results 📊", style=ButtonStyle.green, custom_id="view_results_from_upcoming")
     async def view_results_button(self, interaction: Interaction, button: Button):
         results_view = ResultsView(self.team_data, self.team_id)
         results_embed = self.create_results_embed()
@@ -205,7 +205,7 @@ class ResultsView(BaseTeamView):
         staff_embed = self.create_staff_embed()
         await interaction.response.edit_message(embed=staff_embed, view=staff_view)
 
-    @discord.ui.button(label="View Matches 📅", style=ButtonStyle.success, custom_id="view_matches_from_staff")
+    @discord.ui.button(label="View Matches 📅", style=ButtonStyle.success, custom_id="view_matches_from_results")
     async def view_matches_button(self, interaction: Interaction, button: Button):
         matches_view = UpcomingMatchesView(self.team_data, self.team_id)
         matches_embed = self.create_upcoming_embed()

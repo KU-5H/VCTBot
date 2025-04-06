@@ -3,6 +3,7 @@ import aiohttp
 
 from discord.ui import Button, View
 from discord import ButtonStyle, Embed, Interaction, app_commands
+from datetime import datetime
 
 from scripts.teamNameFetcher import getCachedMappingSync
 
@@ -15,6 +16,7 @@ class BaseTeamView(View):
         self.team_name = team_data["data"]["info"]["name"]
         self.players_data = team_data["data"].get("players", [])
         self.staff_data = team_data["data"].get("staff", [])
+        self.upcoming_matches = team_data["data"].get("upcoming", [])
 
         vlr_url = f"https://www.vlr.gg/team/{team_id}"
         self.add_item(Button(
@@ -49,12 +51,47 @@ class BaseTeamView(View):
         else:
             staff = "No staff listed"
             
-        embed = Embed(title=f"{self.team_name}", color=discord.Color.green())
+        embed = Embed(title=f"{self.team_name}", color=discord.Color.blurple())
         embed.add_field(name="👥 Staff", value=staff, inline=False)
         embed.set_footer(text=f"Team ID: {self.team_id}")
 
         if self.team_logo:
             embed.set_thumbnail(url=self.team_logo)
+        return embed
+    
+    def create_upcoming_embed(self):
+        embed = Embed(title=f"{self.team_name} - Upcoming Matches", color=discord.Color.green())
+
+        if self.upcoming_matches and len(self.upcoming_matches) > 0:
+            list_of_matches = []
+
+            for match in self.upcoming_matches:
+                match_url = match["match"]["url"]
+                event_name = match["event"]["name"]
+                team1_name = match["teams"][0]["tag"]
+                team2_name = match["teams"][1]["tag"]
+
+                try:
+                    match_time = datetime.strptime(match["utc"], "%a, %d %b %Y %H:%M:%S %Z")
+                    date_str = match_time.strftime("%b %d")
+                    time_str = match_time.strftime("%H:%M UTC")
+                except ValueError:
+                    date_str = "TBD"
+                    time_str = "TBD"
+
+                match_line = f"**{date_str}** · {time_str} · [{team1_name} vs {team2_name}]({match_url}) | {event_name}"
+                list_of_matches.append(match_line)
+            
+            matches_text = "\n".join(list_of_matches)
+            embed.description = matches_text
+
+            if self.team_logo:
+                embed.set_thumbnail(url=self.team_logo)
+
+        else:
+            embed.description = "No upcoming matches"
+            if self.team_logo:
+                embed.set_thumbnail(url=self.team_logo)
         return embed
 
 class TeamInfoView(BaseTeamView):
@@ -64,12 +101,38 @@ class TeamInfoView(BaseTeamView):
         staff_embed = self.create_staff_embed()
         await interaction.response.edit_message(embed=staff_embed, view=staff_view)
 
+    @discord.ui.button(label="View Matches 📅", style=ButtonStyle.success, custom_id="view_matches_from_players")
+    async def view_matches_button(self, interaction: Interaction, button: Button):
+        matches_view = UpcomingMatchesView(self.team_data, self.team_id)
+        matches_embed = self.create_upcoming_embed()
+        await interaction.response.edit_message(embed=matches_embed, view=matches_view)
+
 class StaffView(BaseTeamView):
     @discord.ui.button(label="View Players 👥", style=ButtonStyle.primary, custom_id="view_players")
     async def view_players_button(self, interaction: Interaction, button: Button):
         player_view = TeamInfoView(self.team_data, self.team_id)
         player_embed = self.create_player_embed()
         await interaction.response.edit_message(embed=player_embed, view=player_view)
+    
+    @discord.ui.button(label="View Matches 📅", style=ButtonStyle.success, custom_id="view_matches_from_staff")
+    async def view_matches_button(self, interaction: Interaction, button: Button):
+        matches_view = UpcomingMatchesView(self.team_data, self.team_id)
+        matches_embed = self.create_upcoming_embed()
+        await interaction.response.edit_message(embed=matches_embed, view=matches_view)
+
+class UpcomingMatchesView(BaseTeamView):
+    @discord.ui.button(label="View Players 👥", style=ButtonStyle.primary, custom_id="view_players_from_matches")
+    async def view_players_button(self, interaction: Interaction, button: Button):
+        player_view = TeamInfoView(self.team_data, self.team_id)
+        player_embed = self.create_player_embed()
+        await interaction.response.edit_message(embed=player_embed, view=player_view)
+    
+    # Add button to view staff
+    @discord.ui.button(label="View Staff 👔", style=ButtonStyle.primary, custom_id="view_staff_from_matches")
+    async def view_staff_button(self, interaction: Interaction, button: Button):
+        staff_view = StaffView(self.team_data, self.team_id)
+        staff_embed = self.create_staff_embed()
+        await interaction.response.edit_message(embed=staff_embed, view=staff_view)
 
 async def teamInfoById(interaction: Interaction, team_id: int):
     url = f"http://localhost:5000/api/v1/teams/{team_id}"

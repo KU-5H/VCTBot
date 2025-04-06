@@ -75,7 +75,7 @@ class BaseTeamView(View):
                     match_time = datetime.strptime(match["utc"], "%a, %d %b %Y %H:%M:%S %Z")
                     date_str = match_time.strftime("%b %d")
                     time_str = match_time.strftime("%H:%M UTC")
-                except:
+                except ValueError:
                     date_str = "TBD"
                     time_str = "TBD"
 

@@ -62,27 +62,27 @@ class BaseTeamView(View):
         embed = Embed(title=f"{self.team_name} - Upcoming Matches", color=discord.Color.green())
 
         if self.upcoming_matches and len(self.upcoming_matches) > 0:
-            listOfMatches = []
+            list_Of_matches = []
 
             for match in self.upcoming_matches:
-                matchUrl = match["match"]["url"]
-                eventName = match["event"]["name"]
-                team1 = match["teams"][0]
-                team2 = match["teams"][1]
+                match_url = match["match"]["url"]
+                event_name = match["event"]["name"]
+                team1_name = match["teams"][0]["tag"]
+                team2_name = match["teams"][1]["tag"]
 
                 from datetime import datetime
                 try:
-                    matchTime = datetime.strptime(match["utc"], "%a, %d %b %Y %H:%M:%S %Z")
-                    dateStr = matchTime.strftime("%b %d")
-                    timeStr = matchTime.strftime("%H:%M UTC")
+                    match_time = datetime.strptime(match["utc"], "%a, %d %b %Y %H:%M:%S %Z")
+                    date_str = match_time.strftime("%b %d")
+                    time_str = match_time.strftime("%H:%M UTC")
                 except:
-                    dateStr = "TBD"
-                    timeStr = "TBD"
+                    date_str = "TBD"
+                    time_str = "TBD"
 
-                matchLine = f"**{dateStr}** · {timeStr} · [{team1['tag']} vs {team2['tag']}]({matchUrl}) | {eventName}"
-                listOfMatches.append(matchLine)
+                matchLine = f"**{date_str}** · {time_str} · [{team1_name} vs {team2_name}]({match_url}) | {event_name}"
+                list_Of_matches.append(matchLine)
             
-            matchesText = "\n".join(listOfMatches)
+            matchesText = "\n".join(list_Of_matches)
             embed.description = matchesText
 
             if self.team_logo:

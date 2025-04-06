@@ -63,7 +63,7 @@ class BaseTeamView(View):
         embed = Embed(title=f"{self.team_name} - Upcoming Matches", color=discord.Color.green())
 
         if self.upcoming_matches and len(self.upcoming_matches) > 0:
-            list_Of_matches = []
+            list_of_matches = []
 
             for match in self.upcoming_matches:
                 match_url = match["match"]["url"]
@@ -79,10 +79,10 @@ class BaseTeamView(View):
                     date_str = "TBD"
                     time_str = "TBD"
 
-                matchLine = f"**{date_str}** · {time_str} · [{team1_name} vs {team2_name}]({match_url}) | {event_name}"
-                list_Of_matches.append(matchLine)
+                match_line = f"**{date_str}** · {time_str} · [{team1_name} vs {team2_name}]({match_url}) | {event_name}"
+                list_of_matches.append(match_line)
             
-            matchesText = "\n".join(list_Of_matches)
+            matchesText = "\n".join(list_of_matches)
             embed.description = matchesText
 
             if self.team_logo:

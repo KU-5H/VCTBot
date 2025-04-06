@@ -3,6 +3,7 @@ import aiohttp
 
 from discord.ui import Button, View
 from discord import ButtonStyle, Embed, Interaction, app_commands
+from datetime import datetime
 
 from scripts.teamNameFetcher import getCachedMappingSync
 
@@ -70,7 +71,6 @@ class BaseTeamView(View):
                 team1_name = match["teams"][0]["tag"]
                 team2_name = match["teams"][1]["tag"]
 
-                from datetime import datetime
                 try:
                     match_time = datetime.strptime(match["utc"], "%a, %d %b %Y %H:%M:%S %Z")
                     date_str = match_time.strftime("%b %d")

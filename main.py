@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 from teamInfo import teamInfoById, teamNameAutocomplete
 from scripts.teamNameFetcher import initializeCache
 
+from playerInfo import playerInfoById
+
 from discord.ext import commands
 from discord import app_commands
 
@@ -25,6 +27,11 @@ async def team(interaction: discord.Interaction, team_id: int):
 @app_commands.autocomplete(team_name=teamNameAutocomplete)
 async def team(interaction: discord.Interaction, team_name: int):
     await teamInfoById(interaction, team_name)
+
+# Grab the player ID and call the playerInfoById function
+@bot.tree.command(name="playerid", description="Get player info by ID")
+async def player(interaction: discord.Interaction, player_id: int):
+    await playerInfoById(interaction, player_id)
 
 @bot.event
 async def on_ready():

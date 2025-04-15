@@ -119,6 +119,7 @@ class BaseTeamView(View):
                 list_of_matches.append(match_line)
 
             matches_text = "\n".join(list_of_matches)
+            matches_text += "..."
             matches_text = f"```{matches_text}```\nView full results on the team's VLR page"
 
             embed.description = matches_text

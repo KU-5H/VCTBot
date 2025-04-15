@@ -17,7 +17,7 @@ class PlayerView(View):
         self.player_image = player_data["data"]["info"]["img"]
         self.player_url = player_data["data"]["info"]["url"]
         self.player_team_name = player_data["data"]["team"]["name"]
-        self.player_team_id = player_data["data"]["team"]["id"]
+        self.player_team_id = player_data["data"]["team"].get("id", None)
         self.player_team_joined = player_data["data"]["team"]["joined"]
         self.player_country = player_data["data"]["info"]["flag"]
         self.player_socials = player_data["data"]["socials"]
@@ -69,6 +69,9 @@ class PlayerView(View):
     
     @discord.ui.button(label="View Team 📅", style=ButtonStyle.green, custom_id="view_team_from_player")
     async def view_team_button(self, interaction: Interaction, button: Button):
+        if (self.player_team_id is None) or (self.player_team_id == 0):
+            await interaction.response.send_message("❌ Error: No team found for this player.")
+            return
         from teamInfo import teamInfoById
         await teamInfoById(interaction, self.player_team_id)
         

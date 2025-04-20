@@ -5,7 +5,8 @@ from dotenv import load_dotenv
 from teamInfo import teamInfoById, teamNameAutocomplete
 from scripts.teamNameFetcher import initializeCache
 
-from playerInfo import playerInfoById
+from playerInfo import playerInfoById, playerNameAutocomplete
+from scripts.playerNameFetcher import initializePlayerCache
 
 from discord.ext import commands
 from discord import app_commands
@@ -33,6 +34,11 @@ async def team(interaction: discord.Interaction, team_name: int):
 async def player(interaction: discord.Interaction, player_id: int):
     await playerInfoById(interaction, player_id)
 
+@bot.tree.command(name="playername", description="Get player info by Name")
+@app_commands.autocomplete(player_name=playerNameAutocomplete)
+async def player_by_name(interaction: discord.Interaction, player_name: int):
+    await playerInfoById(interaction, player_name)
+
 @bot.event
 async def on_ready():
     try:
@@ -43,6 +49,7 @@ async def on_ready():
 
     print(f"Logged in as {bot.user}")
 
-    await initializeCache()  # Initialize the cache when the bot is ready
+    await initializeCache()
+    await initializePlayerCache()  # Initialize the cache when the bot is ready
 
 bot.run(DISCORD_BOT_TOKEN)

@@ -2,9 +2,9 @@ import discord
 import aiohttp
 
 from discord.ui import Button, View
-from discord import ButtonStyle, Embed, Interaction
+from discord import ButtonStyle, Embed, Interaction, app_commands
 
-from scripts.teamNameFetcher import getCachedMappingSync
+from scripts.playerNameFetcher import getCachedPlayerMappingSync
 
 
 class PlayerView(View):
@@ -93,4 +93,27 @@ async def playerInfoById(interaction: Interaction, player_id: int):
             else:
                 await interaction.response.send_message(f"❌ Error: Unable to fetch data for team ID {player_id} (status code {response.status})")
 
-
+async def playerNameAutocomplete(interaction: discord.Interaction, current: str) -> list[app_commands.Choice[int]]:
+    # Get the player mappings
+    _, players_list = getCachedPlayerMappingSync()
+    
+    # Filter players by the current input
+    filtered_players = []
+    
+    # If there's input, filter players that contain the input string (case insensitive)
+    if current:
+        current_lower = current.lower()
+        filtered_players = [
+            player for player in players_list 
+            if current_lower in player["name"].lower()
+        ][:25]  # Discord limits choices to 25
+    else:
+        filtered_players = players_list[:25]
+    
+    # Convert to Discord choices format
+    choices = [
+        app_commands.Choice(name=player["name"], value=player["id"]) 
+        for player in filtered_players
+    ]
+    
+    return choices

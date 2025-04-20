@@ -51,7 +51,7 @@ async def fetchAllPlayerNames():
                 playersNameList.append({"name": player_name, "id": player_id})
                 fetched_player_ids.add(player_id)
         
-        print(f"Fetched {len(fetched_player_ids)} players)")
+        print(f"Fetched {len(fetched_player_ids)} players")
             
         teams_endpoint = "http://localhost:5000/api/v1/teams?limit=all"
         async with session.get(teams_endpoint) as teams_response:

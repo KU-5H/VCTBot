@@ -6,13 +6,16 @@ import json
 import os
 import asyncio
 
-CACHE_FILE = "player_cache.json"
+CACHE_DIR = os.getenv("CACHE_DIR", ".")
+CACHE_FILE = os.path.join(CACHE_DIR, "player_cache.json")
 CACHE_EXPIRY = 86400  # 24 hours in seconds
+
+API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:5000")
 
 REGIONS = ['na', 'eu', 'ap', 'jp', 'br', 'oce', 'gc', 'la-s', 'la-n', 'oceania', 'mena']
 
 async def fetchPlayersByRegion(session, region):
-    url = f"http://localhost:5000/api/v1/players?timespan=all&limit=all&region={region}"
+    url = f"{API_BASE_URL}/api/v1/players?timespan=all&limit=all&region={region}"
     
     try:
         async with session.get(url) as response:
@@ -29,7 +32,7 @@ async def fetchPlayersByRegion(session, region):
 
 async def fetchPlayersByChunks(session):
     """Fetch players in chunks to handle API limitations"""
-    url = f"http://localhost:5000/api/v1/players?limit=all"
+    url = f"{API_BASE_URL}/api/v1/players?limit=all"
     
     async with session.get(url) as response:
         if response.status == 200:

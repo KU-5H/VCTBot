@@ -1,11 +1,14 @@
 import discord
 import aiohttp
+import os
 
 from discord.ui import Button, View
 from discord import ButtonStyle, Embed, Interaction, app_commands
 from datetime import datetime
 
 from scripts.teamNameFetcher import getCachedMappingSync
+
+API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:5000")
 
 class BaseTeamView(View):
     def __init__(self, team_data, team_id):
@@ -213,7 +216,7 @@ class ResultsView(BaseTeamView):
         await interaction.response.edit_message(embed=matches_embed, view=matches_view)
 
 async def teamInfoById(interaction: Interaction, team_id: int):
-    url = f"http://localhost:5000/api/v1/teams/{team_id}"
+    url = f"{API_BASE_URL}/api/v1/teams/{team_id}"
     
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:

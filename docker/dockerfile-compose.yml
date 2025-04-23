@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  vctbot:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    restart: unless-stopped
+    volumes:
+      - ../cache:/app/cache
+    environment:
+      - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
+      - API_BASE_URL=${API_BASE_URL}

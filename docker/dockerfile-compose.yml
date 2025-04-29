@@ -6,8 +6,7 @@ services:
       context: ..
       dockerfile: docker/Dockerfile
     restart: unless-stopped
+    env_file:
+      - ../.env
     volumes:
-      - ../cache:/app/cache
-    environment:
-      - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
-      - API_BASE_URL=${API_BASE_URL}
+      - ../cache:/app/caches

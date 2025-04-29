@@ -1,0 +1,22 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# Copy requirements and install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the bot code
+COPY main.py .
+COPY app/ ./app/
+COPY scripts/ ./scripts/
+
+# Create directory for cache files
+RUN mkdir -p /app/cache
+
+# Set environment variables
+ENV CACHE_DIR=/app/cache
+ENV PYTHONUNBUFFERED=1
+
+# Run the bot
+CMD ["python", "main.py"]

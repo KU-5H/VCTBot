@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  vctbot:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    volumes:
+      - ../cache:/app/caches

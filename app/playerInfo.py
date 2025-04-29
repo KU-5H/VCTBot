@@ -1,11 +1,13 @@
 import discord
 import aiohttp
+import os
 
 from discord.ui import Button, View
 from discord import ButtonStyle, Embed, Interaction, app_commands
 
 from scripts.playerNameFetcher import getCachedPlayerMappingSync
 
+API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:5000")
 
 class PlayerView(View):
     def __init__(self, player_data, player_id):
@@ -72,11 +74,11 @@ class PlayerView(View):
         if (self.player_team_id is None) or (self.player_team_id == 0):
             await interaction.response.send_message("❌ Error: No team found for this player.")
             return
-        from teamInfo import teamInfoById
+        from app.teamInfo import teamInfoById
         await teamInfoById(interaction, self.player_team_id)
         
 async def playerInfoById(interaction: Interaction, player_id: int):
-    url = f"http://localhost:5000/api/v1/players/{player_id}"
+    url = f"{API_BASE_URL}/api/v1/players/{player_id}"
     
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:

@@ -6,13 +6,16 @@ import time
 import json
 import os
 
-CACHE_FILE = "team_cache.json"
+CACHE_DIR = os.getenv("CACHE_DIR", ".")
+CACHE_FILE = os.path.join(CACHE_DIR, "team_cache.json")
 CACHE_EXPIRY = 86400  # 24 hours in seconds
+
+API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:5000")
 
 REGIONS = ['na', 'eu', 'ap', 'jp', 'br', 'oce', 'gc', 'la-s', 'la-n', 'oceania', 'mena']
 
 async def fetchTeamsByRegion(session, region):
-    url = f"http://localhost:5000/api/v1/teams?limit=all&region={region}"
+    url = f"{API_BASE_URL}/api/v1/teams?limit=all&region={region}"
     
     try:
         async with session.get(url) as response:
@@ -51,7 +54,7 @@ async def fetchAllTeamNames():
                     seen_team_ids.add(team_id)
         
         try:
-            url = "http://localhost:5000/api/v1/teams?limit=all"
+            url = f"{API_BASE_URL}/api/v1/teams?limit=all"
             async with session.get(url) as response:
                 if response.status == 200:
                     data = await response.json()

@@ -2,10 +2,10 @@ import discord
 import os
 from dotenv import load_dotenv
 
-from teamInfo import teamInfoById, teamNameAutocomplete
+from app.teamInfo import teamInfoById, teamNameAutocomplete
 from scripts.teamNameFetcher import initializeCache
 
-from playerInfo import playerInfoById, playerNameAutocomplete
+from app.playerInfo import playerInfoById, playerNameAutocomplete
 from scripts.playerNameFetcher import initializePlayerCache
 
 from discord.ext import commands
